@@ -26,7 +26,7 @@ class App extends React.Component {
       renderFiles: {}
     }
   
-
+    
     this.goBack = this.goBack.bind(this)
     this.open = this.open.bind(this)
     this.renderPath = this.renderPath.bind(this)
@@ -35,9 +35,43 @@ class App extends React.Component {
     this.handleChange = this.handleChange.bind(this)
     this.delFile = this.delFile.bind(this)
     this.refresh = this.refresh.bind(this)
+}
 
+componentDidMount(){
+  this.renderPath();
+}
+
+componentWillMount(){
+  localStorage.getItem('files') && this.setState({
+    files: JSON.parse(localStorage.getItem('files'))
+  })
+
+  localStorage.getItem('file_tree_json') && this.setState({
+    file_tree_json: JSON.parse(localStorage.getItem('file_tree_json'))
+  })
+
+  localStorage.getItem('path') && this.setState({
+    path: localStorage.getItem('path')
+  })
 
 }
+
+componentWillUpdate(nextProps, nextState){
+  localStorage.setItem("files", JSON.stringify(nextState.files))
+  localStorage.setItem("file_tree_json", JSON.stringify(nextState.file_tree_json))
+  localStorage.setItem("path", nextState.path)
+
+}
+
+componentDidUpdate(prevProps, prevState) {
+  console.log( this.state.path , prevState.path )
+  if (this.state.path != prevState.path) {
+    console.log("haan bhai krre h rerender");
+    this.renderPath()
+  }
+}
+
+
 
 refresh(){
   this.renderPath()
@@ -71,6 +105,7 @@ addFile(event){
   temp[folderName] = "";
   this.setState({ files: temp });
   event.preventDefault();
+  
 }
 
 delFile(file){
@@ -78,6 +113,7 @@ delFile(file){
   var temp = this.state.files;
   delete temp [file]
   this.setState({ files: temp });
+  
 }
 
 rename(event, file){
@@ -95,6 +131,7 @@ addFolder(event){
   temp[folderName] = {};
   this.setState({ files: temp });
   event.preventDefault();
+  
 }
 
 
@@ -106,8 +143,7 @@ goBack(event){
   var i = path.lastIndexOf("/")
   path = path.slice(0, i+1)
   this.setState({path: path})
-  this.forceUpdate();
-  this.renderPath();
+  
 }
 
 open(file){
@@ -116,8 +152,6 @@ open(file){
   temp_path = temp_path + file + "/" 
   this.setState({path: temp_path})
   console.log("finsl oprn:", temp_path)
-  this.forceUpdate();
-  this.renderPath();
 }
 
   render(){
@@ -128,23 +162,26 @@ open(file){
         <div>
         <Paper style={{backgroundColor: "lightpink"}} elevation={5}>
           <h1 align="center" >File System</h1>
-          <h2 align="center"> Files and Folders list</h2>
+          <h2 align="center"> Files and Folders list (Hit refresh if folders don't load)</h2>
         </Paper>
+        <Paper style={{backgroundColor: "lightgreen"}} elevation={5}>
+            <h3 align="center" >Directory: {this.state.path}</h3>
+          </Paper>
+
           <Fab color="primary" variant="extended" onClick= {this.refresh} >
             Refresh
               </Fab>
           
-          <Paper style={{backgroundColor: "lightgreen"}} elevation={5}>
-            <h3 align="center" >Directory: {this.state.path}</h3>
-          </Paper>
+          
           
           <div>
-                <Fab color="primary" variant="extended" onClick= {this.goBack} > Back </Fab> 
+                <Fab color="secondary" variant="extended" onClick= {this.goBack} > Back </Fab> 
 
                 <Paper style={{backgroundColor: "lightpink"}} elevation={5}>
                 <form onSubmit={this.handleSubmit} style={{ paddingLeft: '50px' , paddingBottom: '17px', paddingTop: '7px'}}>
                     <label>
-                        Name:
+                      Add to Current Folder({this.state.path})-
+                                        Name:
                         <input type="text" value={this.state.value} onChange={this.handleChange} />
                     </label>
                         <button type="submit" name="Add Folder" onClick= {this.addFolder} >Add Folder</button>
@@ -154,7 +191,7 @@ open(file){
                 </Paper>
                 
                     
-                <Grid container spacing={3} direction="row">
+                <Grid container direction="column" justify="space-around" alignItems="baseline" >
                 <ul style={{ listStyleType: "none" }} >
                     {
                         Object.keys(files).map( file => {
