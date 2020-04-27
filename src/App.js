@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import './App.css';
-import Filetree from './components/Filetree'
 //Redux
 import { Provider } from 'react-redux';
 import FolderIcon from '@material-ui/icons/Folder';
@@ -16,8 +15,8 @@ class App extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      path: "root/My Folder/",
-      file_tree_json: {"root": {"My Folder": {"nestedFolder": {"more nesting": {}}, "nestedFile1":"", "nestedFile2":"" }, "myfile": ""}},
+      path: "root/",
+      file_tree_json: {"root": {"Folder A": {  "Folder C": { "fileZ": ""}, "fileX": ""  },"Folder B": {}, "fileA": "", "fileB": ""}},
       files: {},
       value: null
     }
