@@ -4,13 +4,10 @@ import Filetree from './components/Filetree'
 //Redux
 import { Provider } from 'react-redux';
 import FolderIcon from '@material-ui/icons/Folder';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Grid from '@material-ui/core/Grid'
 import DescriptionIcon from '@material-ui/icons/Description'
 import store from './store';
-import Box from '@material-ui/core/Box';
 import Fab from '@material-ui/core/Fab';
 import Paper from '@material-ui/core/Paper';
 
@@ -22,8 +19,7 @@ class App extends React.Component {
       path: "root/My Folder/",
       file_tree_json: {"root": {"My Folder": {"nestedFolder": {"more nesting": {}}, "nestedFile1":"", "nestedFile2":"" }, "myfile": ""}},
       files: {},
-      value: null,
-      renderFiles: {}
+      value: null
     }
   
     
@@ -34,7 +30,7 @@ class App extends React.Component {
     this.addFolder = this.addFolder.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.delFile = this.delFile.bind(this)
-    this.refresh = this.refresh.bind(this)
+    
 }
 
 componentDidMount(){
@@ -72,11 +68,6 @@ componentDidUpdate(prevProps, prevState) {
 }
 
 
-
-refresh(){
-  this.renderPath()
-}
-
 renderPath(){
   console.log("calling render")
   var file_tree =this.state.file_tree_json
@@ -89,7 +80,6 @@ renderPath(){
       temp_path = temp_path.slice(to+1 , )
   }
   console.log("will render", file_tree)
-  this.setState({renderFiles: file_tree})
   this.setState({files: file_tree})
   this.forceUpdate();
 }
@@ -98,6 +88,7 @@ handleChange(event) {
   this.setState({value: event.target.value});
 
 }
+
 
 addFile(event){
   var temp = this.state.files;
@@ -116,14 +107,8 @@ delFile(file){
   
 }
 
-rename(event, file){
-  console.log(file)
-  var temp = this.state.files;
-  delete temp [file]
-  this.setState({ files: temp });
-  event.preventDefault();
 
-}
+
 addFolder(event){
   console.log("even:", event);
   var temp = this.state.files;
@@ -162,15 +147,13 @@ open(file){
         <div>
         <Paper style={{backgroundColor: "lightpink"}} elevation={5}>
           <h1 align="center" >File System</h1>
-          <h2 align="center"> Files and Folders list (Hit refresh if folders don't load)</h2>
+          <h1 align="center"> Click on folder Icon to open folder</h1>
+          <h2 align="center"> Files and Folders list</h2>
+          
         </Paper>
         <Paper style={{backgroundColor: "lightgreen"}} elevation={5}>
             <h3 align="center" >Directory: {this.state.path}</h3>
           </Paper>
-
-          <Fab color="primary" variant="extended" onClick= {this.refresh} >
-            Refresh
-              </Fab>
           
           
           
@@ -192,24 +175,19 @@ open(file){
                 
                     
                 <Grid container direction="column" justify="space-around" alignItems="baseline" >
-                <ul style={{ listStyleType: "none" }} >
+                <ul style={{ listStyleType: "none" , margin: 20}} >
                     {
                         Object.keys(files).map( file => {
                             if (typeof files[file] !== 'object'){
-                                return <li><DescriptionIcon/> {file} <button name="Delete"  onClick= {e => this.delFile(file)} ><DeleteForeverIcon/></button> </li>
+                                return <li style = {{ margin: 10}}><DescriptionIcon/> {file} <button name="Delete"  onClick= {e => this.delFile(file)} ><DeleteForeverIcon/></button> </li>
                                 
                             }
                             else{
-                                return (<Paper style={{backgroundColor: "lightblue"}} elevation={3}>
+                                return (<Paper style={{height: 40, marginBottom: 15, width: 200, backgroundColor: "lightblue"}} elevation={3}>
 
 
                                 <li > <button name="open"  onClick= {e => this.open(file)} ><FolderIcon/></button> {file}
                                 
-                                <form>
-                                <input type="text" newName={this.state.newName} onChange={this.handleChangeRename} />
-                                <button name="Rename"  onClick= {e => this.rename(file)} >Rename</button>
-                                </form>
-
 
                                  <button  name="Delete" onClick= {e => this.delFile(file)} ><DeleteForeverIcon/></button>  </li>
                                 
